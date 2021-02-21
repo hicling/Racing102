@@ -11,13 +11,19 @@ public class Player : MonoBehaviour
     public float LastLapTime { get; private set; } = 0;
     public float CurrentLapTime { get; private set; } = 0;
     public int CurrentLap { get; private set; } = 0;
+    public float TotalTime { get; private set; } = 0;
 
     private float lapTimeTimestamp;
+    private float firstLapStart;
     private int lastCheckpointPassed = 0;
 
     private Transform checkpointsParent;
     private int checkpointCount;
     private int checkpointLayer;
+
+    private int totalLaps;
+
+    private GameMenuController gameMenuController;
     
     private CarController carController;
 
@@ -27,6 +33,8 @@ public class Player : MonoBehaviour
         checkpointCount = checkpointsParent.childCount;
         checkpointLayer = LayerMask.NameToLayer("Checkpoint");
         carController = GetComponent<CarController>();
+        gameMenuController = GameObject.FindGameObjectWithTag("Canvas").GetComponent<GameMenuController>();
+        totalLaps = Selection.numberOfLaps;
     }
 
     void StartLap()
@@ -35,6 +43,10 @@ public class Player : MonoBehaviour
         CurrentLap++;
         lastCheckpointPassed = 1;
         lapTimeTimestamp = Time.time;
+        if (CurrentLap == 1)
+        {
+            firstLapStart = Time.time;
+        }
     }
 
     void Endlap()
@@ -42,6 +54,11 @@ public class Player : MonoBehaviour
         LastLapTime = Time.time - lapTimeTimestamp;
         BestLapTime = Mathf.Min(LastLapTime, BestLapTime);
         Debug.Log("EndLap - din tid: " + LastLapTime + " sekunder");
+        if (CurrentLap == totalLaps)
+        {
+            TotalTime = Time.time - firstLapStart;
+            gameMenuController.Finnish();
+        }
     }
     
     void OnTriggerEnter(Collider collider)

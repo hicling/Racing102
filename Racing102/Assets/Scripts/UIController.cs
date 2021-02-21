@@ -11,13 +11,23 @@ public class UIController : MonoBehaviour
     public Text UITextLastLapTime;
     public Text UITextBestLapTime;
 
-    public Player UpdateUIForPlayer;
+    public Text UIFinnishTextBestLapTime;
+    public Text UIFinnishTextTotalTime;
+
+    private Player UpdateUIForPlayer;
 
     private int currentLap = -1;
+    private int totalLaps;
     private float currentLapTime;
     private float lastLapTime;
     private float bestLapTime;
+    private float totalTime;
 
+    private void Start()
+    {
+        UpdateUIForPlayer = GameObject.FindGameObjectWithTag("PlayerCar").GetComponent<Player>();
+        totalLaps = Selection.numberOfLaps;
+    }
     void Update()
     {
         if (UpdateUIForPlayer == null)
@@ -26,7 +36,7 @@ public class UIController : MonoBehaviour
         if (UpdateUIForPlayer.CurrentLap != currentLap)
         {
             currentLap = UpdateUIForPlayer.CurrentLap;
-            UITextCurrentLap.text = $"LAP: {currentLap}";
+            UITextCurrentLap.text = $"LAP: {currentLap}/{totalLaps}";
         }
 
         if(UpdateUIForPlayer.CurrentLapTime != currentLapTime)
@@ -45,6 +55,13 @@ public class UIController : MonoBehaviour
         {
             bestLapTime = UpdateUIForPlayer.BestLapTime;
             UITextBestLapTime.text = bestLapTime < 10000 ?$"BEST: {(int)bestLapTime / 60}:{(bestLapTime) % 60:00.000}" : "BEST: NONE";
+            UIFinnishTextBestLapTime.text = bestLapTime < 10000 ? $"BEST LAP: {(int)bestLapTime / 60}:{(bestLapTime) % 60:00.000}" : "BEST LAP: NONE";
+        }
+
+        if (UpdateUIForPlayer.TotalTime != totalTime)
+        {
+            totalTime = UpdateUIForPlayer.TotalTime;
+            UIFinnishTextTotalTime.text = $"TOTAL TIME: {(int)totalTime / 60}:{(totalTime) % 60:00.000}";
         }
     }
 }

@@ -13,6 +13,7 @@ public class CameraFollow : MonoBehaviour
     void Start()
     {
         transform.eulerAngles = eulerRotation;
+        Target = GameObject.FindGameObjectWithTag("PlayerCar").transform;
     }
 
     void Update()

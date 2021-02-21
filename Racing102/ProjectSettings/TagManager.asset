@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - PlayerCar
+  - Canvas
   layers:
   - Default
   - TransparentFX
@@ -40,4 +42,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BackgroundLayer
+    uniqueID: 3926797805
+    locked: 0
+  - name: ObjectLayer
+    uniqueID: 1343389111
     locked: 0
