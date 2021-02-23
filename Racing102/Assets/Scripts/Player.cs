@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
         checkpointCount = checkpointsParent.childCount;
         checkpointLayer = LayerMask.NameToLayer("Checkpoint");
         carController = GetComponent<CarController>();
-        gameMenuController = GameObject.FindGameObjectWithTag("Canvas").GetComponent<GameMenuController>();
+        //gameMenuController = GameObject.FindGameObjectWithTag("Canvas").GetComponent<GameMenuController>();
         totalLaps = Selection.numberOfLaps;
     }
 
