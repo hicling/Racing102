@@ -6704,7 +6704,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputSteerAxis: Horizontal
-  inputThrottleAxis: Vertical
+  inputThrottleAxis: Right Trigger
   inputBrakeAxis: Submit
   inputReset: Reset
 --- !u!1 &592549141
@@ -25863,7 +25863,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6843148271531723921}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: c10255ff717dd444abbde871dcf15ba1, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4

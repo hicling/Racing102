@@ -226,7 +226,7 @@ WheelCollider:
     m_ExtremumValue: 1.4
     m_AsymptoteSlip: 0.8
     m_AsymptoteValue: 1.2
-    m_Stiffness: 1.2
+    m_Stiffness: 1
   m_Enabled: 1
 --- !u!114 &3203820585401691574
 MonoBehaviour:
@@ -9968,7 +9968,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3203820585887336446}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.34, z: 0.47}
+  m_LocalPosition: {x: -0, y: 0.186, z: 0.47}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 3757741528681076752}
@@ -10119,7 +10119,7 @@ WheelCollider:
     m_ExtremumValue: 1.4
     m_AsymptoteSlip: 0.8
     m_AsymptoteValue: 1.2
-    m_Stiffness: 1.2
+    m_Stiffness: 1
   m_Enabled: 1
 --- !u!114 &3203820586318801804
 MonoBehaviour:
@@ -20114,7 +20114,7 @@ MonoBehaviour:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 400
+      value: 600
       inSlope: -0.615077
       outSlope: -0.615077
       tangentMode: 0
@@ -20123,7 +20123,7 @@ MonoBehaviour:
       outWeight: 1
     - serializedVersion: 3
       time: 50
-      value: 300
+      value: 400
       inSlope: -0.24227053
       outSlope: -0.24227053
       tangentMode: 0
@@ -20180,7 +20180,7 @@ MonoBehaviour:
   steerSpeed: 0.5
   brakeForce: 1500
   handbrake: 0
-  downforce: 4
+  downforce: 3.5
   centerOfMass: {fileID: 3203820585887336447}
   speed: 0
 --- !u!54 &4570589221545607851

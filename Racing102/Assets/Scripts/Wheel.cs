@@ -15,11 +15,15 @@ public class Wheel : MonoBehaviour
 
     private WheelCollider wheelCollider;
     private Transform wheelTransform;
+    WheelFrictionCurve standardFFriction;
+    WheelFrictionCurve standardSFriction;
 
     void Start()
     {
         wheelCollider = GetComponentInChildren<WheelCollider>();
         wheelTransform = GetComponentInChildren<MeshRenderer>().GetComponent<Transform>();
+        standardFFriction = wheelCollider.forwardFriction;
+        standardSFriction = wheelCollider.sidewaysFriction;
     }
 
 
@@ -44,6 +48,27 @@ public class Wheel : MonoBehaviour
         if (brake)
         {
             wheelCollider.brakeTorque = BrakeTorque;
+        }
+        WheelHit hit;
+        if (wheelCollider.GetGroundHit(out hit))
+        {
+            float friction = hit.collider.material.staticFriction;
+            WheelFrictionCurve test1 = standardFFriction;
+            WheelFrictionCurve test2 = standardSFriction;
+            if (friction == 0.6f)
+            {
+                test1.stiffness = 0.2f;
+                test2.stiffness = 0.2f;
+
+                wheelCollider.forwardFriction = test1;
+                wheelCollider.sidewaysFriction = test2;
+            }
+            else
+            {
+                wheelCollider.forwardFriction = standardFFriction;
+                wheelCollider.sidewaysFriction = standardSFriction;
+            }
+            Debug.Log(wheelCollider.forwardFriction.stiffness + "  " + hit.collider.material.staticFriction);
         }
     }
 }
