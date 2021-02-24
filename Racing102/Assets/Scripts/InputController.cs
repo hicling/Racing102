@@ -21,7 +21,7 @@ public class InputController : MonoBehaviour
     void Update()
     {
         SteerInput = Input.GetAxis(inputSteerAxis);
-        ThrottleInput = Input.GetAxis(inputThrottleAxis);
+        ThrottleInput = Input.GetAxis(inputThrottleAxis) - Input.GetAxis(inputBrakeAxis);
         BrakeInput = Input.GetAxis(inputBrakeAxis);
         ResetInput = Input.GetAxis(inputReset);
     }
