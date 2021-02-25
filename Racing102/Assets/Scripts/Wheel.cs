@@ -4,10 +4,29 @@ using UnityEngine;
 
 public class Wheel : MonoBehaviour
 {
-    public bool steer;
-    public bool invertSteer;
-    public bool power;
-    public bool brake;
+    [Header("Wheel Parameter")]
+    [SerializeField] bool steer;
+    [SerializeField] bool invertSteer;
+    [SerializeField] bool power;
+    [SerializeField] bool brake;
+    [Header("Surface Parameters Grass")]
+    [SerializeField] float grassFriction = 0.6f;
+    [Range(0.01f, 0.9f)]
+    [SerializeField] float grassSStiffness = 0.3f;
+    [Range(0.01f, 1f)]
+    [SerializeField] float grassDrag = 0.55f;
+    [Header("Surface Parameters Gravel")]
+    [SerializeField] float gravelFriction = 0.7f;
+    [Range(0.01f, 0.9f)]
+    [SerializeField] float gravelSStiffness = 0.6f;
+    [Range(0.01f, 1f)]
+    [SerializeField] float gravelDrag = 0.3f;
+    [Header("Surface Parameters Sand")]
+    [SerializeField] float sandFriction = 0.5f;
+    [Range(0.01f, 0.9f)]
+    [SerializeField] float sandSStiffness = 0.25f;
+    [Range(0.01f, 1f)]
+    [SerializeField] float sandDrag = 0.6f;
 
     public float SteerAngle { get; set; }
     public float Torque { get; set; }
@@ -15,15 +34,20 @@ public class Wheel : MonoBehaviour
 
     private WheelCollider wheelCollider;
     private Transform wheelTransform;
-    WheelFrictionCurve standardFFriction;
+
     WheelFrictionCurve standardSFriction;
+    float standardDrag;
+    Rigidbody rb;
+    
 
     void Start()
     {
         wheelCollider = GetComponentInChildren<WheelCollider>();
         wheelTransform = GetComponentInChildren<MeshRenderer>().GetComponent<Transform>();
-        standardFFriction = wheelCollider.forwardFriction;
         standardSFriction = wheelCollider.sidewaysFriction;
+        rb = GetComponentInParent<Rigidbody>();
+        standardDrag = rb.drag;
+        
     }
 
 
@@ -53,22 +77,34 @@ public class Wheel : MonoBehaviour
         if (wheelCollider.GetGroundHit(out hit))
         {
             float friction = hit.collider.material.staticFriction;
-            WheelFrictionCurve test1 = standardFFriction;
-            WheelFrictionCurve test2 = standardSFriction;
-            if (friction == 0.6f)
+            WheelFrictionCurve savedSFriction = standardSFriction;
+            if (friction == grassFriction)
             {
-                test1.stiffness = 0.2f;
-                test2.stiffness = 0.2f;
+                savedSFriction.stiffness = grassSStiffness;
 
-                wheelCollider.forwardFriction = test1;
-                wheelCollider.sidewaysFriction = test2;
+                wheelCollider.sidewaysFriction = savedSFriction;
+                rb.drag = grassDrag;
+            }
+            else if (friction == gravelFriction)
+            {
+                savedSFriction.stiffness = gravelSStiffness;
+
+                wheelCollider.sidewaysFriction = savedSFriction;
+                rb.drag = gravelDrag;
+            }
+            else if (friction == sandFriction)
+            {
+                savedSFriction.stiffness = sandSStiffness;
+
+                wheelCollider.sidewaysFriction = savedSFriction;
+                rb.drag = sandDrag;
             }
             else
             {
-                wheelCollider.forwardFriction = standardFFriction;
+            
                 wheelCollider.sidewaysFriction = standardSFriction;
+                rb.drag = standardDrag;
             }
-            Debug.Log(wheelCollider.forwardFriction.stiffness + "  " + hit.collider.material.staticFriction);
-        }
+        }      
     }
 }

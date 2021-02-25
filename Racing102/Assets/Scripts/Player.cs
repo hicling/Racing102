@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public float CurrentLapTime { get; private set; } = 0;
     public int CurrentLap { get; private set; } = 0;
     public float TotalTime { get; private set; } = 0;
+    public float SpeedKph { get; private set; } = 0;
 
     private float lapTimeTimestamp;
     private float firstLapStart;
@@ -91,6 +92,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         CurrentLapTime = lapTimeTimestamp > 0 ? Time.time - lapTimeTimestamp : 0;
+        SpeedKph = carController.Speed;
         if (controlType == ControlType.HumanInput)
         {
             carController.Steer = GameManager.Instance.InputController.SteerInput;

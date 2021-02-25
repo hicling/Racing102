@@ -5,14 +5,15 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    public GameObject UIRacePanel;
-    public Text UITextCurrentLap;
-    public Text UITextCurrentTime;
-    public Text UITextLastLapTime;
-    public Text UITextBestLapTime;
+    [SerializeField] GameObject UIRacePanel;
+    [SerializeField] Text UITextCurrentLap;
+    [SerializeField] Text UITextCurrentTime;
+    [SerializeField] Text UITextLastLapTime;
+    [SerializeField] Text UITextBestLapTime;
 
-    public Text UIFinnishTextBestLapTime;
-    public Text UIFinnishTextTotalTime;
+    [SerializeField] Text UIFinnishTextBestLapTime;
+    [SerializeField] Text UIFinnishTextTotalTime;
+    [SerializeField] Text UITextSpeedKph;
 
     private Player UpdateUIForPlayer;
 
@@ -22,6 +23,7 @@ public class UIController : MonoBehaviour
     private float lastLapTime;
     private float bestLapTime;
     private float totalTime;
+    private float speedKph;
 
     private void Start()
     {
@@ -33,6 +35,13 @@ public class UIController : MonoBehaviour
         if (UpdateUIForPlayer == null)
             return;
         
+        if (UpdateUIForPlayer.SpeedKph != speedKph)
+        {
+            speedKph = UpdateUIForPlayer.SpeedKph;
+            speedKph = Mathf.Abs(speedKph);
+            UITextSpeedKph.text = $"{speedKph.ToString("f0")} km/h";
+        }
+
         if (UpdateUIForPlayer.CurrentLap != currentLap)
         {
             currentLap = UpdateUIForPlayer.CurrentLap;
