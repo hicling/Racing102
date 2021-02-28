@@ -5,8 +5,10 @@ using Mirror;
 
 public class PlayerMp : NetworkBehaviour
 {
-    public enum ControlType { HumanInput, AI }
-    public ControlType controlType = ControlType.HumanInput;
+    [SerializeField] Behaviour[] componentsToDisable;
+    [SerializeField] GameObject playerUIPrefab;
+
+    private GameObject playerUIInstance;
 
     public float BestLapTime { get; private set; } = Mathf.Infinity;
     public float LastLapTime { get; private set; } = 0;
@@ -17,17 +19,15 @@ public class PlayerMp : NetworkBehaviour
 
     private float lapTimeTimestamp;
     private float firstLapStart;
-    private int lastCheckpointPassed = 0;
+    public int lastCheckpointPassed { get; set; } = 0;
+
+    private int totalLaps;
+
+    private CarControllerMp carController;
 
     private Transform checkpointsParent;
     private int checkpointCount;
     private int checkpointLayer;
-
-    private int totalLaps;
-
-    private GameMenuController gameMenuController;
-
-    private CarController carController;
 
     public override void OnStartServer()
     {
@@ -38,19 +38,48 @@ public class PlayerMp : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         Camera.main.GetComponent<CameraFollowMp>().setTarget(carController.transform);
+        
     }
 
-    void Awake()
+    public override void OnStartClient()
     {
-        checkpointsParent = GameObject.Find("Checkpoints").transform;
-        checkpointCount = checkpointsParent.childCount;
-        checkpointLayer = LayerMask.NameToLayer("Checkpoint");
-        carController = GetComponentInChildren<CarController>();
-        //gameMenuController = GameObject.FindGameObjectWithTag("Canvas").GetComponent<GameMenuController>();
+        base.OnStartClient();
+
+        string _netID = GetComponent<NetworkIdentity>().netId.ToString();
+        PlayerMp _player = GetComponent<PlayerMp>();
+        GameManager.RegisterPlayer(_netID, _player);
+
+        //carController = GetComponentInChildren<CarControllerMp>();
+        carController = GetComponent<CarControllerMp>();
         totalLaps = Selection.numberOfLaps;
+
     }
 
-    void StartLap()
+    void Start()
+    {
+        if (!isLocalPlayer)
+        {
+            DisableComponents();
+        }
+        else
+        {
+            playerUIInstance = Instantiate(playerUIPrefab);
+            playerUIInstance.name = playerUIPrefab.name;
+
+            PlayerUIController ui = playerUIInstance.GetComponent<PlayerUIController>();
+            if (ui == null)
+                Debug.LogError("No Ui on playerUI prefab");
+            ui.SetController(GetComponent<PlayerMp>());
+
+            checkpointsParent = GameObject.Find("Checkpoints").transform;
+            checkpointCount = checkpointsParent.childCount;
+            Debug.Log(checkpointCount);
+            checkpointLayer = LayerMask.NameToLayer("Checkpoint");
+        }
+
+    }
+
+    public void StartLap()
     {
         Debug.Log("StartLap");
         CurrentLap++;
@@ -62,7 +91,7 @@ public class PlayerMp : NetworkBehaviour
         }
     }
 
-    void Endlap()
+    public void Endlap()
     {
         LastLapTime = Time.time - lapTimeTimestamp;
         BestLapTime = Mathf.Min(LastLapTime, BestLapTime);
@@ -70,7 +99,19 @@ public class PlayerMp : NetworkBehaviour
         if (CurrentLap == totalLaps)
         {
             TotalTime = Time.time - firstLapStart;
-            gameMenuController.Finnish();
+        }
+    }
+
+    void Update()
+    {
+        CurrentLapTime = lapTimeTimestamp > 0 ? Time.time - lapTimeTimestamp : 0;
+        SpeedKph = carController.Speed;
+        if (hasAuthority)
+        {
+            carController.Steer = Input.GetAxis("Horizontal");
+            carController.Throttle = Input.GetAxis("Right Trigger") - Input.GetAxis("Submit");
+            carController.Brake = Input.GetAxis("Submit");
+            carController.Reset = Input.GetAxis("Reset");
         }
     }
 
@@ -99,18 +140,20 @@ public class PlayerMp : NetworkBehaviour
         {
             lastCheckpointPassed++;
         }
+
     }
 
-    void Update()
+    private void OnDisable()
     {
-        CurrentLapTime = lapTimeTimestamp > 0 ? Time.time - lapTimeTimestamp : 0;
-        SpeedKph = carController.Speed;
-        if (controlType == ControlType.HumanInput && isLocalPlayer)
+        Destroy(playerUIInstance);
+        GameManager.UnRegisterPlayer(transform.name);
+    }
+
+    void DisableComponents()
+    {
+        for (int i = 0; i < componentsToDisable.Length; i++)
         {
-            carController.Steer = Input.GetAxis("Horizontal");
-            carController.Throttle = Input.GetAxis("Right Trigger") - Input.GetAxis("Submit");
-            carController.Brake = Input.GetAxis("Submit");
-            carController.Reset = Input.GetAxis("Reset");
+            componentsToDisable[i].enabled = false;
         }
     }
 }
