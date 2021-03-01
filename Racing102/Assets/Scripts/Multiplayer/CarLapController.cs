@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class CarLapController : MonoBehaviour
+public class CarLapController : NetworkBehaviour
 {
     [SerializeField] private CarControllerMp carController;
     public float BestLapTime { get; private set; } = Mathf.Infinity;
@@ -11,10 +12,19 @@ public class CarLapController : MonoBehaviour
     public int CurrentLap { get; private set; } = 0;
     public float TotalTime { get; private set; } = 0;
     public float SpeedKph { get; private set; } = 0;
+    public int lastCheckpointPassed { get; set; } = 0;
+
+    private PositionSystem room;
+    
+
+    private void Awake()
+    {
+        room = GameObject.FindGameObjectWithTag("PositionSystem").GetComponent<PositionSystem>();
+    }
 
     private float lapTimeTimestamp;
     private float firstLapStart;
-    public int lastCheckpointPassed { get; set; } = 0;
+    
 
     private int totalLaps;
 
@@ -28,6 +38,12 @@ public class CarLapController : MonoBehaviour
         checkpointCount = checkpointsParent.childCount;
         Debug.Log(checkpointCount);
         checkpointLayer = LayerMask.NameToLayer("Checkpoint");
+        room.CarLapPlayers.Add(this);
+    }
+
+    public override void OnStopClient()
+    {
+        room.CarLapPlayers.Remove(this);
     }
     public void StartLap()
     {

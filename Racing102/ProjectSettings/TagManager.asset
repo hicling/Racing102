@@ -6,6 +6,7 @@ TagManager:
   tags:
   - PlayerCar
   - Canvas
+  - PositionSystem
   layers:
   - Default
   - TransparentFX

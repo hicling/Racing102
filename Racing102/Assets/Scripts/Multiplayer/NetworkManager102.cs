@@ -19,6 +19,7 @@ public class NetworkManager102 : NetworkManager
     [SerializeField] private GameObject playerSpawnSystem = null;
     [SerializeField] private GameObject roundSystem = null;
     [SerializeField] private GameObject skidMarks = null;
+    [SerializeField] private GameObject positionSystem = null;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
@@ -171,6 +172,9 @@ public class NetworkManager102 : NetworkManager
 
             GameObject SkidMarksInstance = Instantiate(skidMarks);
             NetworkServer.Spawn(SkidMarksInstance);
+
+            GameObject PositionSystemInstance = Instantiate(positionSystem);
+            NetworkServer.Spawn(PositionSystemInstance);
         }
     }
 
