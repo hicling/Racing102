@@ -12,7 +12,7 @@ public class PlayerUIController : MonoBehaviour
     [SerializeField] Text UITextBestLapTime;
     [SerializeField] Text UITextSpeedKph;
 
-    private PlayerMp controller;
+    private CarLapController controller;
 
     private int currentLap = -1;
     private int totalLaps;
@@ -20,7 +20,6 @@ public class PlayerUIController : MonoBehaviour
     private float lastLapTime;
     private float bestLapTime;
     private float speedKph;
-    private int playerCount;
 
     private void Start()
     {
@@ -62,15 +61,9 @@ public class PlayerUIController : MonoBehaviour
             bestLapTime = controller.BestLapTime;
             UITextBestLapTime.text = bestLapTime < 10000 ? $"BEST: {(int)bestLapTime / 60}:{(bestLapTime) % 60:00.000}" : "BEST: NONE";
         }
-
-        if (GameManager.players.Count != playerCount)
-        {
-            playerCount = GameManager.players.Count;
-            UITextCurrentPos.text = $"POS: {playerCount}";
-        }
     }
 
-    public void SetController(PlayerMp _controller)
+    public void SetController(CarLapController _controller)
     {
         controller = _controller;
     }

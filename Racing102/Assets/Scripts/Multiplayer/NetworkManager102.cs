@@ -16,9 +16,14 @@ public class NetworkManager102 : NetworkManager
 
     [Header("Game")]
     [SerializeField] private NetworkGamePlayer102 gamePlayerPrefab = null;
+    [SerializeField] private GameObject playerSpawnSystem = null;
+    [SerializeField] private GameObject roundSystem = null;
+    [SerializeField] private GameObject skidMarks = null;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
+    public static event Action<NetworkConnection> OnServerReadied;
+    public static event Action OnServerStopped;
 
     public List<NetworkRoomPlayer102> RoomPlayers { get; } = new List<NetworkRoomPlayer102>();
     public List<NetworkGamePlayer102> GamePlayers { get; } = new List<NetworkGamePlayer102>();
@@ -26,6 +31,7 @@ public class NetworkManager102 : NetworkManager
     public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
     public override void OnStartClient()
     {
+
         var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
 
         foreach (var prefab in spawnablePrefabs)
@@ -93,7 +99,10 @@ public class NetworkManager102 : NetworkManager
 
     public override void OnStopServer()
     {
+        OnServerStopped?.Invoke();
+
         RoomPlayers.Clear();
+        GamePlayers.Clear();
     }
 
     public void NotifyPlayersOfReadyState()
@@ -127,14 +136,14 @@ public class NetworkManager102 : NetworkManager
             {
                 return;
             }
-
-            ServerChangeScene("GameMultiplayer");
+            
+            ServerChangeScene("Map_01");
         }
     }
 
     public override void ServerChangeScene(string newSceneName)
     {
-        if (SceneManager.GetActiveScene().name == menuScene && newSceneName.StartsWith("GameMultiplayer"))
+        if (SceneManager.GetActiveScene().name == menuScene && newSceneName.StartsWith("Map"))
         {
             for (int i = RoomPlayers.Count - 1; i >= 0; i--)
             {
@@ -148,5 +157,27 @@ public class NetworkManager102 : NetworkManager
             }
         }
         base.ServerChangeScene(newSceneName);
+    }
+
+    public override void OnServerSceneChanged(string sceneName)
+    {
+        if (sceneName.StartsWith("Map"))
+        {
+            GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+            NetworkServer.Spawn(playerSpawnSystemInstance);
+
+            GameObject roundSystemInstance = Instantiate(roundSystem);
+            NetworkServer.Spawn(roundSystemInstance);
+
+            GameObject SkidMarksInstance = Instantiate(skidMarks);
+            NetworkServer.Spawn(SkidMarksInstance);
+        }
+    }
+
+    public override void OnServerReady(NetworkConnection conn)
+    {
+        base.OnServerReady(conn);
+
+        OnServerReadied?.Invoke(conn);
     }
 }

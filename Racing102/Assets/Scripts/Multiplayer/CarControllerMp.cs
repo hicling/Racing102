@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CarControllerMp : MonoBehaviour
 {
-
+    [Header("Player")]
+    [SerializeField] private PlayerMp _player;
     [Header("Car Parameters")]
     [SerializeField] AnimationCurve motorTorque = new AnimationCurve(new Keyframe(0, 200), new Keyframe(50, 300), new Keyframe(200, 0));
     [Range(2, 16)]
@@ -39,10 +40,6 @@ public class CarControllerMp : MonoBehaviour
     private Quaternion target;
     private Vector3 movePosition;
     private float steering;
-
-    private Transform checkpointsParent;
-    private int checkpointCount;
-    private int checkpointLayer;
 
     void Start()
     {
@@ -99,33 +96,4 @@ public class CarControllerMp : MonoBehaviour
         speed = transform.InverseTransformDirection(rb.velocity).z * 3.6f;
         rb.AddForce(-transform.up * speed * downforce);
     }
-
-    //void OnTriggerEnter(Collider collider)
-    //{
-    //    if (collider.gameObject.layer != checkpointLayer)
-    //    {
-    //        return;
-    //    }
-
-    //    if (collider.gameObject.name == "1")
-    //    {
-    //        if (_player.lastCheckpointPassed == checkpointCount)
-    //        {
-    //            _player.Endlap();
-    //        }
-
-    //        if (_player.CurrentLap == 0 || _player.lastCheckpointPassed == checkpointCount)
-    //        {
-    //            _player.StartLap();
-    //        }
-    //        return;
-    //    }
-
-    //    if (collider.gameObject.name == (_player.lastCheckpointPassed + 1).ToString())
-    //    {
-    //        _player.lastCheckpointPassed++;
-    //    }
-        
-    //}
-
 }
