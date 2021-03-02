@@ -122,6 +122,7 @@ MonoBehaviour:
   playerUIPrefab: {fileID: 3243216685324447800, guid: 4fb159588f399d74a9e8fdb68d1adc47,
     type: 3}
   carController: {fileID: 2589205044941888022}
+  carLapController: {fileID: 5622249262468116817}
 --- !u!1 &2589205044941888217
 GameObject:
   m_ObjectHideFlags: 0

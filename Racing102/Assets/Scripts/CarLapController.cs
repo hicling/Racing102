@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CarLapController : MonoBehaviour
 {
-    [SerializeField] private CarControllerMp carController;
+    [SerializeField] private CarController carController;
     public float BestLapTime { get; private set; } = Mathf.Infinity;
     public float LastLapTime { get; private set; } = 0;
     public float CurrentLapTime { get; private set; } = 0;

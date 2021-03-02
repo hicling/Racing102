@@ -30,7 +30,6 @@ public class PositionSystem : NetworkBehaviour
         TotalLaps = Room.NumberOfLaps;
     }
 
-    [Server]
     private void Update()
     {
         foreach (var player in CarLapPlayers)

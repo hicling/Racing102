@@ -6,7 +6,8 @@ using Mirror;
 public class PlayerMp : NetworkBehaviour
 {
     [SerializeField] GameObject playerUIPrefab;
-    [SerializeField] CarControllerMp carController;
+    [SerializeField] CarController carController;
+    [SerializeField] CarLapController carLapController;
 
     private GameObject playerUIInstance;
 
@@ -31,20 +32,18 @@ public class PlayerMp : NetworkBehaviour
         if (!hasAuthority) { return; }
         
         playerUIInstance = Instantiate(playerUIPrefab);
-        
-
         PlayerUIController ui = playerUIInstance.GetComponent<PlayerUIController>();
         if (ui == null)
             Debug.LogError("No Ui on playerUI prefab");
         ui.SetController(GetComponentInChildren<CarLapController>());
-        
     }
     
     [ClientCallback]
     void Update()
     {
         if (!hasAuthority) { return; }
-
+        
+        if (carLapController.Finnished) { return; }
         carController.Steer = InputManager.Controls.Player.Steer.ReadValue<float>();
         carController.Throttle = InputManager.Controls.Player.Throttle.ReadValue<float>() - InputManager.Controls.Player.Brake.ReadValue<float>();
         carController.Brake = InputManager.Controls.Player.Brake.ReadValue<float>();

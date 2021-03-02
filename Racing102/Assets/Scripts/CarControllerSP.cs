@@ -1,11 +1,10 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CarControllerMp : MonoBehaviour
+public class CarControllerSP : MonoBehaviour
 {
-    [Header("Player")]
-    [SerializeField] private PlayerMp _player;
+    
     [Header("Car Parameters")]
     [SerializeField] AnimationCurve motorTorque = new AnimationCurve(new Keyframe(0, 200), new Keyframe(50, 300), new Keyframe(200, 0));
     [Range(2, 16)]
@@ -31,6 +30,9 @@ public class CarControllerMp : MonoBehaviour
     [SerializeField] float speed = 0.0f;
     public float Speed { get { return speed; } }
 
+    
+
+
     public float Steer { get; set; }
     public float Throttle { get; set; }
     public float Brake { get; set; }
@@ -46,8 +48,7 @@ public class CarControllerMp : MonoBehaviour
         wheels = GetComponentsInChildren<Wheel>();
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = centerOfMass.localPosition;
-        
-        foreach (var wheel in wheels)
+        foreach(var wheel in wheels)
         {
             wheel.Torque = 0.0001f;
         }
@@ -74,10 +75,10 @@ public class CarControllerMp : MonoBehaviour
                 wheel.Torque = 0;
                 wheel.BrakeTorque = Mathf.Abs(Throttle) * brakeForce;
             }
-
-
+            
+            
         }
-        if (Reset == 1)
+        if(Reset == 1)
         {
             movePosition = rb.position;
             movePosition.y = 5;
@@ -88,7 +89,7 @@ public class CarControllerMp : MonoBehaviour
             rb.MovePosition(movePosition);
             rb.MoveRotation(target);
         }
-
+    
     }
 
     private void FixedUpdate()
@@ -96,4 +97,5 @@ public class CarControllerMp : MonoBehaviour
         speed = transform.InverseTransformDirection(rb.velocity).z * 3.6f;
         rb.AddForce(-transform.up * speed * downforce);
     }
+
 }
