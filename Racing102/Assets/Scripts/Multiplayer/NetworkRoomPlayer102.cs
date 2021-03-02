@@ -28,15 +28,11 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
     }
 
     private NetworkManager102 room;
-
     private NetworkManager102 Room
     {
         get
         {
-            if (room != null)
-            {
-                return room;
-            }
+            if (room != null) { return room; }
             return room = NetworkManager.singleton as NetworkManager102;
         }
     }
@@ -77,6 +73,7 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
                     break;
                 }
             }
+
             return;
         }
 
@@ -89,7 +86,9 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         for (int i = 0; i < Room.RoomPlayers.Count; i++)
         {
             playerNameTexts[i].text = Room.RoomPlayers[i].DisplayName;
-            playerReadyTexts[i].text = Room.RoomPlayers[i].IsReady ? "<color=green>READY</color>" : "<color=red>NOT READY</color>";
+            playerReadyTexts[i].text = Room.RoomPlayers[i].IsReady ?
+                "<color=green>READY</color>" :
+                "<color=red>NOT READY</color>";
         }
     }
 
@@ -120,10 +119,7 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
     [Command]
     public void CmdStartGame()
     {
-        if (Room.RoomPlayers[0].connectionToClient != connectionToClient)
-        {
-            return;
-        }
+        if (Room.RoomPlayers[0].connectionToClient != connectionToClient) { return; }
 
         Room.StartGame();
     }

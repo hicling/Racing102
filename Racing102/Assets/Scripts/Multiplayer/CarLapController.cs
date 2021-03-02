@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 
-public class CarLapController : NetworkBehaviour
+public class CarLapController : MonoBehaviour
 {
     [SerializeField] private CarControllerMp carController;
     public float BestLapTime { get; private set; } = Mathf.Infinity;
@@ -12,44 +11,47 @@ public class CarLapController : NetworkBehaviour
     public int CurrentLap { get; private set; } = 0;
     public float TotalTime { get; private set; } = 0;
     public float SpeedKph { get; private set; } = 0;
-    public int lastCheckpointPassed { get; set; } = 0;
+    public int LastCheckpointPassed { get; set; } = 0;
+    public int Position { get; set; }
+    public int numberOfPlayers { get; set; }
+    public float DistanceToNextCheckpoint { get; private set; }
+    public bool Finnished { get; private set; } = false;
 
-    private PositionSystem room;
-    
-
-    private void Awake()
-    {
-        room = GameObject.FindGameObjectWithTag("PositionSystem").GetComponent<PositionSystem>();
-    }
+    private PositionSystem positionSystem;
 
     private float lapTimeTimestamp;
     private float firstLapStart;
-    
 
     private int totalLaps;
+    public int TotalLaps { get { return totalLaps; } set { totalLaps = value; } }
 
     private Transform checkpointsParent;
     private int checkpointCount;
     private int checkpointLayer;
 
+    private void Awake()
+    {
+        positionSystem = GameObject.FindGameObjectWithTag("PositionSystem").GetComponent<PositionSystem>();
+    }    
+
     private void Start()
     {
         checkpointsParent = GameObject.Find("Checkpoints").transform;
         checkpointCount = checkpointsParent.childCount;
-        Debug.Log(checkpointCount);
         checkpointLayer = LayerMask.NameToLayer("Checkpoint");
-        room.CarLapPlayers.Add(this);
+        positionSystem.CarLapPlayers.Add(this);
+        totalLaps = positionSystem.TotalLaps;
     }
 
-    public override void OnStopClient()
+    public void OnDestroy()
     {
-        room.CarLapPlayers.Remove(this);
+        positionSystem.CarLapPlayers.Remove(this);
     }
     public void StartLap()
     {
-        Debug.Log("StartLap");
+        if(CurrentLap == totalLaps) { return; }
         CurrentLap++;
-        lastCheckpointPassed = 1;
+        LastCheckpointPassed = 1;
         lapTimeTimestamp = Time.time;
         if (CurrentLap == 1)
         {
@@ -65,6 +67,7 @@ public class CarLapController : NetworkBehaviour
         if (CurrentLap == totalLaps)
         {
             TotalTime = Time.time - firstLapStart;
+            Finnished = true;
         }
     }
 
@@ -72,6 +75,14 @@ public class CarLapController : NetworkBehaviour
     {
         CurrentLapTime = lapTimeTimestamp > 0 ? Time.time - lapTimeTimestamp : 0;
         SpeedKph = carController.Speed;
+        FindDistanceToNextCheckpoint();
+    }
+
+    private void FindDistanceToNextCheckpoint()
+    {
+        int index = LastCheckpointPassed;
+        if (index == 7) { index = 0; }
+        DistanceToNextCheckpoint = Vector3.Distance(checkpointsParent.GetChild(index).transform.position, this.transform.position);
     }
 
     void OnTriggerEnter(Collider collider)
@@ -83,21 +94,21 @@ public class CarLapController : NetworkBehaviour
 
         if (collider.gameObject.name == "1")
         {
-            if (lastCheckpointPassed == checkpointCount)
+            if (LastCheckpointPassed == checkpointCount)
             {
                 Endlap();
             }
 
-            if (CurrentLap == 0 || lastCheckpointPassed == checkpointCount)
+            if (CurrentLap == 0 || LastCheckpointPassed == checkpointCount)
             {
                 StartLap();
             }
             return;
         }
 
-        if (collider.gameObject.name == (lastCheckpointPassed + 1).ToString())
+        if (collider.gameObject.name == (LastCheckpointPassed + 1).ToString())
         {
-            lastCheckpointPassed++;
+            LastCheckpointPassed++;
         }
 
     }

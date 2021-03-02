@@ -10,15 +10,11 @@ public class NetworkGamePlayer102 : NetworkBehaviour
     private string displayName = "Loading...";
 
     private NetworkManager102 room;
-
     private NetworkManager102 Room
     {
         get
         {
-            if (room != null)
-            {
-                return room;
-            }
+            if (room != null) { return room; }
             return room = NetworkManager.singleton as NetworkManager102;
         }
     }
@@ -26,6 +22,7 @@ public class NetworkGamePlayer102 : NetworkBehaviour
     public override void OnStartClient()
     {
         DontDestroyOnLoad(gameObject);
+
         Room.GamePlayers.Add(this);
     }
 

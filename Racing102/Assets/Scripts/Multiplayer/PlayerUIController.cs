@@ -20,10 +20,12 @@ public class PlayerUIController : MonoBehaviour
     private float lastLapTime;
     private float bestLapTime;
     private float speedKph;
+    private int position = -1;
+    private int numberOfPlayers = -1;
 
     private void Start()
     {
-        totalLaps = Selection.numberOfLaps;
+        totalLaps = controller.TotalLaps;
     }
 
     void Update()
@@ -61,6 +63,13 @@ public class PlayerUIController : MonoBehaviour
             bestLapTime = controller.BestLapTime;
             UITextBestLapTime.text = bestLapTime < 10000 ? $"BEST: {(int)bestLapTime / 60}:{(bestLapTime) % 60:00.000}" : "BEST: NONE";
         }
+
+        position = controller.Position;
+        numberOfPlayers = controller.numberOfPlayers;
+        UITextCurrentPos.text = $"POS: {position}/{numberOfPlayers}";
+
+       
+        
     }
 
     public void SetController(CarLapController _controller)

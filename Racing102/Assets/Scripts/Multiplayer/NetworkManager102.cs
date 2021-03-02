@@ -9,6 +9,10 @@ using UnityEngine.SceneManagement;
 public class NetworkManager102 : NetworkManager
 {
     [SerializeField] private int minPlayers = 2;
+    [SerializeField] private int numberOfLaps = 3;
+    public int NumberOfLaps { get { return numberOfLaps; } set { numberOfLaps = value; } }
+
+
     [SerializeField] private string menuScene = string.Empty;
 
     [Header("Room")]
@@ -29,13 +33,18 @@ public class NetworkManager102 : NetworkManager
     public List<NetworkRoomPlayer102> RoomPlayers { get; } = new List<NetworkRoomPlayer102>();
     public List<NetworkGamePlayer102> GamePlayers { get; } = new List<NetworkGamePlayer102>();
 
-    public override void OnStartServer() => spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+    public override void OnStartServer()
+    {
+        spawnPrefabs.Clear();
+        spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+    }    
+        
     public override void OnStartClient()
     {
+        spawnPrefabs.Clear();
+        spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
-        var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
-
-        foreach (var prefab in spawnablePrefabs)
+        foreach (var prefab in spawnPrefabs)
         {
             ClientScene.RegisterPrefab(prefab);
         }
@@ -133,11 +142,8 @@ public class NetworkManager102 : NetworkManager
     {
         if(SceneManager.GetActiveScene().name == menuScene)
         {
-            if (!IsReadyToStart())
-            {
-                return;
-            }
-            
+            if (!IsReadyToStart()) { return; }
+
             ServerChangeScene("Map_01");
         }
     }
@@ -151,8 +157,6 @@ public class NetworkManager102 : NetworkManager
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
-
-                NetworkServer.Destroy(conn.identity.gameObject);
 
                 NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject);
             }

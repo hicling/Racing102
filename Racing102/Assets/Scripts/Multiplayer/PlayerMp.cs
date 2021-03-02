@@ -10,8 +10,6 @@ public class PlayerMp : NetworkBehaviour
 
     private GameObject playerUIInstance;
 
-    private float previusThrottle;
-
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -33,7 +31,7 @@ public class PlayerMp : NetworkBehaviour
         if (!hasAuthority) { return; }
         
         playerUIInstance = Instantiate(playerUIPrefab);
-        playerUIInstance.name = playerUIPrefab.name;
+        
 
         PlayerUIController ui = playerUIInstance.GetComponent<PlayerUIController>();
         if (ui == null)

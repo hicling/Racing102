@@ -29,6 +29,7 @@ public class RoundSystem : NetworkBehaviour
     {
         NetworkManager102.OnServerStopped += CleanUpServer;
         NetworkManager102.OnServerReadied += CheckToStartRound;
+        PositionSystem.OnFinnished += StopRound;
     }
 
     [ServerCallback]
@@ -39,6 +40,7 @@ public class RoundSystem : NetworkBehaviour
     {
         NetworkManager102.OnServerStopped -= CleanUpServer;
         NetworkManager102.OnServerReadied -= CheckToStartRound;
+        PositionSystem.OnFinnished -= StopRound;
     }
 
     [ServerCallback]
@@ -55,6 +57,12 @@ public class RoundSystem : NetworkBehaviour
         animator.enabled = true;
 
         RpcStartCountdown();
+    }
+
+    [ServerCallback]
+    private void StopRound(float bestLap)
+    {
+        Debug.Log(bestLap);
     }
 
     #endregion
