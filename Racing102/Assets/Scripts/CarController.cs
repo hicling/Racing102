@@ -47,10 +47,10 @@ public class CarController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.centerOfMass = centerOfMass.localPosition;
         
-        foreach (var wheel in wheels)
-        {
-            wheel.Torque = 0.0001f;
-        }
+        //foreach (var wheel in wheels)
+        //{
+        //    wheel.Torque = 0.0001f;
+        //}
     }
 
     void Update()

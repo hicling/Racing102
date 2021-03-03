@@ -73,7 +73,13 @@ public class CarLapController : MonoBehaviour
 
     private void Update()
     {
-        CurrentLapTime = lapTimeTimestamp > 0 ? Time.time - lapTimeTimestamp : 0;
+        if (!Finnished)
+        {
+            CurrentLapTime = lapTimeTimestamp > 0 ? Time.time - lapTimeTimestamp : 0;
+        }else
+        {
+            CurrentLapTime = LastLapTime;
+        }
         SpeedKph = carController.Speed;
         FindDistanceToNextCheckpoint();
     }
