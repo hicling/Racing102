@@ -8,33 +8,30 @@ using TMPro;
 
 public class PlayerMp : NetworkBehaviour
 {
-    [SerializeField] GameObject playerUIPrefab;
-    [SerializeField] CarController carController;
-    [SerializeField] CarLapController carLapController;
+    [SerializeField] private GameObject playerUIPrefab;
+    [SerializeField] private CarController carController;
+    [SerializeField] private CarLapController carLapController;
     [Header("PlayerName")]
     [SerializeField] private Canvas canvasNameTag;
-    [SerializeField] TMP_Text playerNametext;
+    [SerializeField] private TMP_Text playerNametext;
 
     public static event Action<PlayerMp> OnPlayerSpawned;
     public static event Action<PlayerMp> OnPlayerDespawned;
-    public static event Action<PlayerMp, int, bool> OnFinnished;
+    public static event Action<PlayerMp, bool> OnFinnished;
 
     [SyncVar(hook = nameof(HandlePlayerFinnish))]
     private bool finnished = false;
     [SyncVar(hook = nameof(HandleOwnerSet))]
     private uint ownerId;
-    [SyncVar]
-    [SerializeField]private int finalPosition;
 
     public bool Finnished => finnished;
     public uint OwnderId => ownerId;
-    public int FinalPosition => finalPosition;
 
     private GameObject playerUIInstance;
 
     private void HandlePlayerFinnish(bool odlvalue, bool newValue)
     {
-        OnFinnished?.Invoke(this, finalPosition, finnished);
+        OnFinnished?.Invoke(this, finnished);
     }
 
     private void HandleOwnerSet(uint oldValue, uint newValue)
@@ -47,9 +44,8 @@ public class PlayerMp : NetworkBehaviour
     }
 
     [Server]
-    public void SetFinnish(bool finnish, int finnishPosition)
+    public void SetFinnish(bool finnish)
     {
-        this.finalPosition = finnishPosition;
         this.finnished = finnish;        
 
         if (!isServerOnly) { return; }
@@ -66,7 +62,6 @@ public class PlayerMp : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        Debug.Log("Server stardet!");
     }
 
     public override void OnStartAuthority()

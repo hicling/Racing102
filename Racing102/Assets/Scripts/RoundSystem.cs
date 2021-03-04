@@ -8,6 +8,7 @@ public class RoundSystem : NetworkBehaviour
 {
     [SerializeField] private Animator animator = null;
 
+    private int finnishPosition;
     private List<NetworkGamePlayer102> playingPlayers;
 
     private NetworkManager102 room;
@@ -60,27 +61,39 @@ public class RoundSystem : NetworkBehaviour
 
         playingPlayers = Room.GamePlayers;
 
+        finnishPosition = 1;
+
         RpcStartCountdown();
     }
 
-    [ServerCallback]
-    private void StopRound(float bestLap)
+    [Server]
+    private void HandlePlayerFinnish(PlayerMp player, bool finnished)
     {
-        Debug.Log(bestLap);
+        Debug.Log(player.OwnderId + " - " + finnishPosition + " - " + finnished);
+
+        foreach (var gamePlayer in playingPlayers)
+        {
+            if (gamePlayer.connectionToClient == player.connectionToClient)
+            {
+                gamePlayer.SetFinalPosition(finnishPosition);
+            }
+        }
+
+        finnishPosition++;
+
+        if (finnishPosition - 1 == playingPlayers.Count)
+        {
+            Debug.Log("alla har gått imål!");
+            EndRound();
+        }
     }
 
-    [Server]
-    private void HandlePlayerFinnish(PlayerMp player, int position, bool finnished)
+    [ServerCallback]
+    private void EndRound()
     {
-        Debug.Log(player.OwnderId + " - " + position + " - " + finnished);
-        //foreach (var gamePlayer in playingPlayers)
-        //{
-        //    if (gamePlayer.connectionToClient == player.connectionToClient)
-        //    {
-        //        gamePlayer.SetFinalPosition(position);
-        //    }
-        //}
+        
     }
+
     #endregion
 
     #region Client

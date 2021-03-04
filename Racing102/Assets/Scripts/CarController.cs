@@ -35,6 +35,7 @@ public class CarController : MonoBehaviour
     public float Throttle { get; set; }
     public float Brake { get; set; }
     public float Reset { get; set; }
+
     private Rigidbody rb;
     private Wheel[] wheels;
     private Quaternion target;

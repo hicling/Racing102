@@ -34,10 +34,7 @@ public class PositionSystem : NetworkBehaviour
 
         for (int i = 0; i < sortedCarLapPlayers.Count; i++)
         {
-            if (!sortedCarLapPlayers[i].Finnished)
-            {
-                sortedCarLapPlayers[i].Position = i + 1;
-            }
+            sortedCarLapPlayers[i].Position = i + 1;
         }
     }
 
@@ -45,8 +42,7 @@ public class PositionSystem : NetworkBehaviour
     void Finnished(CarLapController player)
     {
         var playerMp = player.GetComponentInParent<PlayerMp>();
-        Debug.Log(playerMp.OwnderId);
-        playerMp.SetFinnish(true, player.FinnishedPosition);
+        playerMp.SetFinnish(true);
     }
 
     [Server]
