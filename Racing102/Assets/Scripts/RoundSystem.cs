@@ -8,6 +8,8 @@ public class RoundSystem : NetworkBehaviour
 {
     [SerializeField] private Animator animator = null;
 
+    private List<NetworkGamePlayer102> playingPlayers;
+
     private NetworkManager102 room;
     private NetworkManager102 Room
     {
@@ -29,7 +31,7 @@ public class RoundSystem : NetworkBehaviour
     {
         NetworkManager102.OnServerStopped += CleanUpServer;
         NetworkManager102.OnServerReadied += CheckToStartRound;
-        PositionSystem.OnFinnished += StopRound;
+        PlayerMp.OnFinnished += HandlePlayerFinnish;
     }
 
     [ServerCallback]
@@ -40,7 +42,7 @@ public class RoundSystem : NetworkBehaviour
     {
         NetworkManager102.OnServerStopped -= CleanUpServer;
         NetworkManager102.OnServerReadied -= CheckToStartRound;
-        PositionSystem.OnFinnished -= StopRound;
+        PlayerMp.OnFinnished -= HandlePlayerFinnish;
     }
 
     [ServerCallback]
@@ -56,6 +58,8 @@ public class RoundSystem : NetworkBehaviour
 
         animator.enabled = true;
 
+        playingPlayers = Room.GamePlayers;
+
         RpcStartCountdown();
     }
 
@@ -65,6 +69,18 @@ public class RoundSystem : NetworkBehaviour
         Debug.Log(bestLap);
     }
 
+    [Server]
+    private void HandlePlayerFinnish(PlayerMp player, int position, bool finnished)
+    {
+        Debug.Log(player.OwnderId + " - " + position + " - " + finnished);
+        //foreach (var gamePlayer in playingPlayers)
+        //{
+        //    if (gamePlayer.connectionToClient == player.connectionToClient)
+        //    {
+        //        gamePlayer.SetFinalPosition(position);
+        //    }
+        //}
+    }
     #endregion
 
     #region Client

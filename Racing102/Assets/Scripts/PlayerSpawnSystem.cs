@@ -41,8 +41,11 @@ public class PlayerSpawnSystem : NetworkBehaviour
             Debug.LogError($"Missing spawn point for player {nextIndex}");
             return;
         }
+        var gamePlayer = conn.identity.GetComponent<NetworkGamePlayer102>();
 
-        GameObject playerInstance = Instantiate(playerPrefab, spawnPoints[nextIndex].position, spawnPoints[nextIndex].rotation);
+        var playerInstance = Instantiate(playerPrefab, spawnPoints[nextIndex].position, spawnPoints[nextIndex].rotation);
+        var playerMp = playerInstance.GetComponent<PlayerMp>();
+        playerMp.SetOwner(gamePlayer.netId);
         NetworkServer.Spawn(playerInstance, conn);
 
         nextIndex++;

@@ -17,6 +17,9 @@ public class CarLapController : MonoBehaviour
     public float DistanceToNextCheckpoint { get; private set; }
     public bool Finnished { get; private set; } = false;
 
+    private int finnishedPosition;
+    public int FinnishedPosition => finnishedPosition;
+
     private PositionSystem positionSystem;
 
     private float lapTimeTimestamp;
@@ -66,6 +69,7 @@ public class CarLapController : MonoBehaviour
         Debug.Log("EndLap - din tid: " + LastLapTime + " sekunder");
         if (CurrentLap == totalLaps)
         {
+            finnishedPosition = Position;
             TotalTime = Time.time - firstLapStart;
             Finnished = true;
         }

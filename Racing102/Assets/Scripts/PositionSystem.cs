@@ -11,24 +11,9 @@ public class PositionSystem : NetworkBehaviour
 
     private List<CarLapController> sortedCarLapPlayers = null;
 
-    public int TotalLaps { get; private set; }
-
-    public static event Action<float> OnFinnished;
-
-    private NetworkManager102 room;
-    private NetworkManager102 Room
-    {
-        get
-        {
-            if (room != null) { return room; }
-            return room = NetworkManager.singleton as NetworkManager102;
-        }
-    }
-
-    void Awake()
-    {
-        TotalLaps = Room.NumberOfLaps;
-    }
+    [SyncVar]
+    private int totalLaps;
+    public int TotalLaps => totalLaps;
 
     private void Update()
     {
@@ -41,7 +26,7 @@ public class PositionSystem : NetworkBehaviour
         {
             if (player.Finnished)
             {
-                Finnished(player.BestLapTime);
+                Finnished(player);
             }
         }
 
@@ -49,12 +34,24 @@ public class PositionSystem : NetworkBehaviour
 
         for (int i = 0; i < sortedCarLapPlayers.Count; i++)
         {
-            sortedCarLapPlayers[i].Position = i + 1;
+            if (!sortedCarLapPlayers[i].Finnished)
+            {
+                sortedCarLapPlayers[i].Position = i + 1;
+            }
         }
     }
 
-    void Finnished(float bestLap)
+    [Server]
+    void Finnished(CarLapController player)
     {
-        OnFinnished?.Invoke(bestLap);
+        var playerMp = player.GetComponentInParent<PlayerMp>();
+        Debug.Log(playerMp.OwnderId);
+        playerMp.SetFinnish(true, player.FinnishedPosition);
+    }
+
+    [Server]
+    public void SetNumberOfLaps(int numberOfLaps)
+    {
+        totalLaps = numberOfLaps;
     }
 }

@@ -2,14 +2,66 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerMp : NetworkBehaviour
 {
     [SerializeField] GameObject playerUIPrefab;
     [SerializeField] CarController carController;
     [SerializeField] CarLapController carLapController;
+    [Header("PlayerName")]
+    [SerializeField] private Canvas canvasNameTag;
+    [SerializeField] TMP_Text playerNametext;
+
+    public static event Action<PlayerMp> OnPlayerSpawned;
+    public static event Action<PlayerMp> OnPlayerDespawned;
+    public static event Action<PlayerMp, int, bool> OnFinnished;
+
+    [SyncVar(hook = nameof(HandlePlayerFinnish))]
+    private bool finnished = false;
+    [SyncVar(hook = nameof(HandleOwnerSet))]
+    private uint ownerId;
+    [SyncVar]
+    [SerializeField]private int finalPosition;
+
+    public bool Finnished => finnished;
+    public uint OwnderId => ownerId;
+    public int FinalPosition => finalPosition;
 
     private GameObject playerUIInstance;
+
+    private void HandlePlayerFinnish(bool odlvalue, bool newValue)
+    {
+        OnFinnished?.Invoke(this, finalPosition, finnished);
+    }
+
+    private void HandleOwnerSet(uint oldValue, uint newValue)
+    {
+        OnPlayerSpawned?.Invoke(this);
+
+        var gamePlayer = NetworkIdentity.spawned[ownerId].GetComponent<NetworkGamePlayer102>();
+
+        playerNametext.text = gamePlayer.DisplayName;
+    }
+
+    [Server]
+    public void SetFinnish(bool finnish, int finnishPosition)
+    {
+        this.finalPosition = finnishPosition;
+        this.finnished = finnish;        
+
+        if (!isServerOnly) { return; }
+    }
+
+    [Server]
+    public void SetOwner(uint ownerId)
+    {
+        this.ownerId = ownerId;
+
+        if (!isServerOnly) { return; }
+    }
 
     public override void OnStartServer()
     {
@@ -19,6 +71,7 @@ public class PlayerMp : NetworkBehaviour
 
     public override void OnStartAuthority()
     {
+        canvasNameTag.gameObject.SetActive(false);
         enabled = true;
     }
 
@@ -54,6 +107,11 @@ public class PlayerMp : NetworkBehaviour
     private void OnDisable()
     {
         Destroy(playerUIInstance);
+    }
+
+    private void OnDestroy()
+    {
+        OnPlayerDespawned?.Invoke(this);
     }
 
 }

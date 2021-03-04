@@ -10,8 +10,6 @@ public class NetworkManager102 : NetworkManager
 {
     [SerializeField] private int minPlayers = 2;
     [SerializeField] private int numberOfLaps = 3;
-    public int NumberOfLaps { get { return numberOfLaps; } set { numberOfLaps = value; } }
-
 
     [SerializeField] private string menuScene = string.Empty;
 
@@ -23,7 +21,7 @@ public class NetworkManager102 : NetworkManager
     [SerializeField] private GameObject playerSpawnSystem = null;
     [SerializeField] private GameObject roundSystem = null;
     [SerializeField] private GameObject skidMarks = null;
-    [SerializeField] private GameObject positionSystem = null;
+    [SerializeField] private PositionSystem positionSystem = null;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
@@ -97,13 +95,19 @@ public class NetworkManager102 : NetworkManager
     {
         if (conn.identity != null)
         {
-            var player = conn.identity.GetComponent<NetworkRoomPlayer102>();
+            var player = conn.identity.GetComponent<NetworkBehaviour>();
 
-            RoomPlayers.Remove(player);
+            if(player is NetworkRoomPlayer102 roomPlayer)
+            {
+                RoomPlayers.Remove(roomPlayer);
 
-            NotifyPlayersOfReadyState();
+                NotifyPlayersOfReadyState();
+            }
+            else if(player is NetworkGamePlayer102 gamePlayer)
+            {
+                GamePlayers.Remove(gamePlayer);
+            }
         }
-
         base.OnServerDisconnect(conn);
     }
 
@@ -177,8 +181,9 @@ public class NetworkManager102 : NetworkManager
             GameObject SkidMarksInstance = Instantiate(skidMarks);
             NetworkServer.Spawn(SkidMarksInstance);
 
-            GameObject PositionSystemInstance = Instantiate(positionSystem);
-            NetworkServer.Spawn(PositionSystemInstance);
+            var PositionSystemInstance = Instantiate(positionSystem);
+            PositionSystemInstance.SetNumberOfLaps(numberOfLaps);
+            NetworkServer.Spawn(PositionSystemInstance.gameObject);
         }
     }
 
