@@ -32,6 +32,14 @@ public class PlayerMp : NetworkBehaviour
     private void HandlePlayerFinnish(bool odlvalue, bool newValue)
     {
         OnFinnished?.Invoke(this, finnished);
+        StartCoroutine(DisablePlayerUI());
+    }
+
+    IEnumerator DisablePlayerUI()
+    {
+
+        yield return new WaitForSecondsRealtime(2);
+        //playerUIInstance.SetActive(false);
     }
 
     private void HandleOwnerSet(uint oldValue, uint newValue)
@@ -84,6 +92,7 @@ public class PlayerMp : NetworkBehaviour
         if (ui == null)
             Debug.LogError("No Ui on playerUI prefab");
         ui.SetController(GetComponentInChildren<CarLapController>());
+        playerUIInstance.SetActive(true);
     }
     
     [ClientCallback]

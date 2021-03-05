@@ -7,11 +7,10 @@ using UnityEngine.UI;
 public class NetworkGamePlayer102 : NetworkBehaviour
 {
     [SyncVar]
-    private string displayName = "Loading...";
+    public string DisplayName = "Loading...";
     [SyncVar]
-    private int position;
-    public string DisplayName => displayName;
-    public int Position => position;
+    public int Position;
+
 
     private NetworkManager102 room;
     private NetworkManager102 Room
@@ -38,12 +37,12 @@ public class NetworkGamePlayer102 : NetworkBehaviour
     [Server]
     public void SetDisplayName(string displayName)
     {
-        this.displayName = displayName;
+        this.DisplayName = displayName;
     }
 
     [Server]
     public void SetFinalPosition(int finalPosition)
     {
-        position = finalPosition;
+        Position = finalPosition;
     }
 }

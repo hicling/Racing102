@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System.Linq;
+using TMPro;
 
 public class RoundSystem : NetworkBehaviour
 {
+    [Header("UI")]
     [SerializeField] private Animator animator = null;
+    [SerializeField] private GameObject FinnishPanel = null;
+    [SerializeField] private TMP_Text goldText;
+    [SerializeField] private TMP_Text silverText;
+    [SerializeField] private TMP_Text bronzeText;
+    [SerializeField] private GameObject BronzeImage;
 
     private int finnishPosition;
+
+    [SyncVar]
     private List<NetworkGamePlayer102> playingPlayers;
 
     private NetworkManager102 room;
@@ -71,7 +80,7 @@ public class RoundSystem : NetworkBehaviour
     {
         Debug.Log(player.OwnderId + " - " + finnishPosition + " - " + finnished);
 
-        foreach (var gamePlayer in playingPlayers)
+        foreach (var gamePlayer in Room.GamePlayers)
         {
             if (gamePlayer.connectionToClient == player.connectionToClient)
             {
@@ -81,7 +90,7 @@ public class RoundSystem : NetworkBehaviour
 
         finnishPosition++;
 
-        if (finnishPosition - 1 == playingPlayers.Count)
+        if (finnishPosition - 1 == Room.GamePlayers.Count)
         {
             Debug.Log("alla har gått imål!");
             EndRound();
@@ -92,6 +101,7 @@ public class RoundSystem : NetworkBehaviour
     private void EndRound()
     {
         
+        RpcEnableFinnish();
     }
 
     #endregion
@@ -108,6 +118,33 @@ public class RoundSystem : NetworkBehaviour
     private void RpcStartRound()
     {
         InputManager.Remove(ActionMapNames.Player);
+    }
+
+    [ClientRpc]
+    private void RpcEnableFinnish()
+    {
+        if (playingPlayers.Count > 2)
+        {
+            BronzeImage.SetActive(true);
+        }
+
+        foreach (var playingPlayer in Room.GamePlayers)
+        {
+            if (playingPlayer.Position == 1)
+            {
+                goldText.text = playingPlayer.DisplayName;
+            }
+            else if (playingPlayer.Position == 2)
+            {
+                silverText.text = playingPlayer.DisplayName;
+            }
+            else if (playingPlayer.Position == 3)
+            {
+                bronzeText.text = playingPlayer.DisplayName;
+            }
+        }
+
+        FinnishPanel.SetActive(true);
     }
 
     #endregion
