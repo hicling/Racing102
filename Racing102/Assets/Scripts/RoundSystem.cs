@@ -16,9 +16,14 @@ public class RoundSystem : NetworkBehaviour
     [SerializeField] private GameObject BronzeImage;
 
     private int finnishPosition;
-
     [SyncVar]
-    private List<NetworkGamePlayer102> playingPlayers;
+    [SerializeField] private string valueGoldText;
+    [SyncVar]
+    [SerializeField] private string valueSilverText;
+    [SyncVar]
+    [SerializeField] private string valueBronzeText;
+    [SyncVar]
+    private int numberOfPlayers;
 
     private NetworkManager102 room;
     private NetworkManager102 Room
@@ -68,7 +73,7 @@ public class RoundSystem : NetworkBehaviour
 
         animator.enabled = true;
 
-        playingPlayers = Room.GamePlayers;
+        numberOfPlayers = Room.GamePlayers.Count;
 
         finnishPosition = 1;
 
@@ -85,6 +90,18 @@ public class RoundSystem : NetworkBehaviour
             if (gamePlayer.connectionToClient == player.connectionToClient)
             {
                 gamePlayer.SetFinalPosition(finnishPosition);
+                if (finnishPosition == 1)
+                {
+                    valueGoldText = gamePlayer.DisplayName;
+                }
+                else if (finnishPosition == 2)
+                {
+                    valueSilverText = gamePlayer.DisplayName;
+                }
+                else if (finnishPosition == 3)
+                {
+                    valueBronzeText = gamePlayer.DisplayName;
+                }
             }
         }
 
@@ -93,14 +110,19 @@ public class RoundSystem : NetworkBehaviour
         if (finnishPosition - 1 == Room.GamePlayers.Count)
         {
             Debug.Log("alla har gått imål!");
-            EndRound();
+            StartCoroutine(WaitEndRound());            
         }
+    }
+
+    IEnumerator WaitEndRound()
+    {
+        yield return new WaitForSecondsRealtime(2);
+        EndRound();
     }
 
     [ServerCallback]
     private void EndRound()
     {
-        
         RpcEnableFinnish();
     }
 
@@ -123,26 +145,14 @@ public class RoundSystem : NetworkBehaviour
     [ClientRpc]
     private void RpcEnableFinnish()
     {
-        if (playingPlayers.Count > 2)
+        if (numberOfPlayers > 2)
         {
             BronzeImage.SetActive(true);
+            bronzeText.text = valueBronzeText;
         }
 
-        foreach (var playingPlayer in Room.GamePlayers)
-        {
-            if (playingPlayer.Position == 1)
-            {
-                goldText.text = playingPlayer.DisplayName;
-            }
-            else if (playingPlayer.Position == 2)
-            {
-                silverText.text = playingPlayer.DisplayName;
-            }
-            else if (playingPlayer.Position == 3)
-            {
-                bronzeText.text = playingPlayer.DisplayName;
-            }
-        }
+        goldText.text = valueGoldText;
+        silverText.text = valueSilverText;
 
         FinnishPanel.SetActive(true);
     }
