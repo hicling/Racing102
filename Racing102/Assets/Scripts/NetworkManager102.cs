@@ -27,6 +27,7 @@ public class NetworkManager102 : NetworkManager
     public static event Action OnClientDisconnected;
     public static event Action<NetworkConnection> OnServerReadied;
     public static event Action OnServerStopped;
+    public static event Action OnSceneChange;
 
     public List<NetworkRoomPlayer102> RoomPlayers { get; } = new List<NetworkRoomPlayer102>();
     public List<NetworkGamePlayer102> GamePlayers { get; } = new List<NetworkGamePlayer102>();
@@ -126,6 +127,15 @@ public class NetworkManager102 : NetworkManager
             player.HandleReadyToStart(IsReadyToStart());
         }
     }
+
+    public void NotifyPlayersOfReadyStateGame()
+    {
+        foreach (var player in GamePlayers)
+        {
+            player.HandleReadyToStart(IsReadyToStartGame());
+        }
+    }
+
     private bool IsReadyToStart()
     {
         if (numPlayers < minPlayers)
@@ -133,6 +143,22 @@ public class NetworkManager102 : NetworkManager
             return false;
         }
         foreach (var player in RoomPlayers)
+        {
+            if (!player.IsReady)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private bool IsReadyToStartGame()
+    {
+        if (numPlayers < minPlayers)
+        {
+            return false;
+        }
+        foreach (var player in GamePlayers)
         {
             if (!player.IsReady)
             {
@@ -152,8 +178,14 @@ public class NetworkManager102 : NetworkManager
         }
     }
 
+    public void RestartRound()
+    {
+        ServerChangeScene("Map_01");
+    }
+
     public override void ServerChangeScene(string newSceneName)
     {
+        OnSceneChange?.Invoke();
         if (SceneManager.GetActiveScene().name == menuScene && newSceneName.StartsWith("Map"))
         {
             for (int i = RoomPlayers.Count - 1; i >= 0; i--)
@@ -161,6 +193,7 @@ public class NetworkManager102 : NetworkManager
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayerInstance = Instantiate(gamePlayerPrefab);
                 gameplayerInstance.SetDisplayName(RoomPlayers[i].DisplayName);
+                gameplayerInstance.IsLeader = RoomPlayers[i].IsLeader;
 
                 NetworkServer.ReplacePlayerForConnection(conn, gameplayerInstance.gameObject);
             }

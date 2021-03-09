@@ -20,6 +20,10 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
     private bool isLeader;
     public bool IsLeader
     {
+        get
+        {
+            return isLeader;
+        }
         set
         {
             isLeader = value;
