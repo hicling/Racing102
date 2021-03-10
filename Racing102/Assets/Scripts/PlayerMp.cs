@@ -101,6 +101,9 @@ public class PlayerMp : NetworkBehaviour
         if (!hasAuthority) { return; }
         
         if (carLapController.Finnished) { return; }
+
+        if (PauseMenu.IsOn) { return; }
+
         carController.Steer = InputManager.Controls.Player.Steer.ReadValue<float>();
         carController.Throttle = InputManager.Controls.Player.Throttle.ReadValue<float>() - InputManager.Controls.Player.Brake.ReadValue<float>();
         carController.Brake = InputManager.Controls.Player.Brake.ReadValue<float>();

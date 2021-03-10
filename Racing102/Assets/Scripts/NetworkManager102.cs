@@ -178,6 +178,12 @@ public class NetworkManager102 : NetworkManager
         }
     }
 
+    public void EndGame()
+    {
+        StopHost();
+        Destroy(this);
+        return;
+    }
     public void RestartRound()
     {
         ServerChangeScene("Map_01");

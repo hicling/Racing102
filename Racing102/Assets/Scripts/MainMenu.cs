@@ -1,17 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private NetworkManager102 networkManager = null;
+    //private NetworkManager102 networkManager = null;
 
     [Header("UI")]
     [SerializeField] private GameObject LandingPagePanel = null;
 
+    private NetworkManager102 room;
+    private NetworkManager102 Room
+    {
+        get
+        {
+            if (room != null) { return room; }
+            return room = NetworkManager.singleton as NetworkManager102;
+        }
+    }
+
     public void HostLobby()
     {
-        networkManager.StartHost();
+        Room.StartHost();
 
         LandingPagePanel.SetActive(false);
     }

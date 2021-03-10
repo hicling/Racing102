@@ -2,15 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 
 public class JoinLobbyMenu : MonoBehaviour
 {
-    [SerializeField] private NetworkManager102 networkManager = null;
+    //[SerializeField] private NetworkManager102 networkManager = null;
 
     [Header("UI")]
     [SerializeField] private GameObject LandingPagePanel = null;
     [SerializeField] private InputField ipAddressInputField = null;
     [SerializeField] private Button joinButton = null;
+
+    private NetworkManager102 room;
+    private NetworkManager102 Room
+    {
+        get
+        {
+            if (room != null) { return room; }
+            return room = NetworkManager.singleton as NetworkManager102;
+        }
+    }
 
     private void OnEnable()
     {
@@ -28,8 +39,8 @@ public class JoinLobbyMenu : MonoBehaviour
     {
         string ipAddress = ipAddressInputField.text;
 
-        networkManager.networkAddress = ipAddress;
-        networkManager.StartClient();
+        Room.networkAddress = ipAddress;
+        Room.StartClient();
 
         joinButton.interactable = false;
     }

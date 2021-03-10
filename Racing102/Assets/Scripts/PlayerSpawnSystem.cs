@@ -51,4 +51,8 @@ public class PlayerSpawnSystem : NetworkBehaviour
         nextIndex++;
     }
 
+    public override void OnStopServer()
+    {
+        NetworkManager102.OnServerReadied -= SpawnPlayer;
+    }
 }
