@@ -127,4 +127,16 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
 
         Room.StartGame();
     }
+
+    public void GoBack()
+    {
+        if (isServer)
+        {
+            Room.StopHost();
+        }
+        else
+        {
+            Room.StopClient();
+        }
+    }
 }

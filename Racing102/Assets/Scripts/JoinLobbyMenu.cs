@@ -56,5 +56,6 @@ public class JoinLobbyMenu : MonoBehaviour
     private void HandleClientDisconnected()
     {
         joinButton.interactable = true;
+        LandingPagePanel.SetActive(true);
     }
 }
