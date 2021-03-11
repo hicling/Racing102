@@ -31,6 +31,8 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         }
     }
 
+    private GameObject NameInputPanel;
+
     private NetworkManager102 room;
     private NetworkManager102 Room
     {
@@ -39,6 +41,12 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
             if (room != null) { return room; }
             return room = NetworkManager.singleton as NetworkManager102;
         }
+    }
+
+    private void Start()
+    {
+
+        NameInputPanel = FindInActiveObjectByName("Panel_NameInput");
     }
 
     public override void OnStartAuthority()
@@ -136,7 +144,24 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         }
         else
         {
+            NameInputPanel.SetActive(true);
             Room.StopClient();
         }
+    }
+
+    GameObject FindInActiveObjectByName(string name)
+    {
+        Transform[] objs = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
+        for (int i = 0; i < objs.Length; i++)
+        {
+            if (objs[i].hideFlags == HideFlags.None)
+            {
+                if (objs[i].name == name)
+                {
+                    return objs[i].gameObject;
+                }
+            }
+        }
+        return null;
     }
 }

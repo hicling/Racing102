@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class PlayerSpawnSystem : NetworkBehaviour
 {
@@ -21,15 +22,21 @@ public class PlayerSpawnSystem : NetworkBehaviour
 
     public static void RemoveSpawnPoint(Transform transform) => spawnPoints.Remove(transform);
 
-    public override void OnStartServer() => NetworkManager102.OnServerReadied += SpawnPlayer;
+    public override void OnStartServer()
+    {
+        NetworkManager102.OnServerReadied += SpawnPlayer;
+    }
 
     public override void OnStartClient()
     {
         InputManager.Add(ActionMapNames.Player);
         InputManager.Controls.Player.Pause.Enable();
     }
-    [ServerCallback]
-    private void OnDestroy() => NetworkManager102.OnServerReadied -= SpawnPlayer;
+
+    private void OnDestroy()
+    {
+        NetworkManager102.OnServerReadied -= SpawnPlayer;
+    }
 
     [Server]
     public void SpawnPlayer(NetworkConnection conn)
@@ -49,10 +56,5 @@ public class PlayerSpawnSystem : NetworkBehaviour
         NetworkServer.Spawn(playerInstance, conn);
 
         nextIndex++;
-    }
-
-    public override void OnStopServer()
-    {
-        NetworkManager102.OnServerReadied -= SpawnPlayer;
     }
 }

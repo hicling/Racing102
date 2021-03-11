@@ -34,19 +34,19 @@ public class NetworkManager102 : NetworkManager
 
     public override void OnStartServer()
     {
-        spawnPrefabs.Clear();
-        spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+        //spawnPrefabs.Clear();
+        //spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
     }    
         
     public override void OnStartClient()
     {
-        spawnPrefabs.Clear();
-        spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+        //spawnPrefabs.Clear();
+        //spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
 
-        foreach (var prefab in spawnPrefabs)
-        {
-            ClientScene.RegisterPrefab(prefab);
-        }
+        //foreach (var prefab in spawnPrefabs)
+        //{
+        //    ClientScene.RegisterPrefab(prefab);
+        //}
     }
 
     public override void OnClientConnect(NetworkConnection conn)
@@ -59,6 +59,8 @@ public class NetworkManager102 : NetworkManager
     public override void OnClientDisconnect(NetworkConnection conn)
     {
         base.OnClientDisconnect(conn);
+
+        SceneManager.LoadScene(offlineScene);
 
         OnClientDisconnected?.Invoke();
     }
@@ -181,7 +183,6 @@ public class NetworkManager102 : NetworkManager
     public void EndGame()
     {
         StopHost();
-        Destroy(this);
         return;
     }
     public void RestartRound()
