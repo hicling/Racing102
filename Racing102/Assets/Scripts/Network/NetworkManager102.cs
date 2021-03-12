@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class NetworkManager102 : NetworkManager
 {
     [SerializeField] private int minPlayers = 2;
-    [SerializeField] private int numberOfLaps = 3;
+    private int numberOfLaps;
 
     [SerializeField] private string menuScene = string.Empty;
 
@@ -23,6 +23,13 @@ public class NetworkManager102 : NetworkManager
     [SerializeField] private GameObject skidMarks = null;
     [SerializeField] private PositionSystem positionSystem = null;
 
+    public int NumberOfLaps
+    {
+        set
+        {
+            numberOfLaps = value;
+        }
+    }
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
     public static event Action<NetworkConnection> OnServerReadied;
@@ -183,6 +190,7 @@ public class NetworkManager102 : NetworkManager
     public void EndGame()
     {
         StopHost();
+
         return;
     }
     public void RestartRound()

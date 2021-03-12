@@ -11,6 +11,7 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
     [SerializeField] private Text[] playerNameTexts = new Text[6];
     [SerializeField] private Text[] playerReadyTexts = new Text[6];
     [SerializeField] private Button startGameButton = null;
+    [SerializeField] private InputField numberOfLapsInputField = null;
 
     [SyncVar(hook = nameof(HandleDisplayNameChanged))]
     public string DisplayName = "Loading...";
@@ -28,6 +29,8 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         {
             isLeader = value;
             startGameButton.gameObject.SetActive(value);
+            numberOfLapsInputField.gameObject.SetActive(value);
+
         }
     }
 
@@ -111,7 +114,14 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
             return;
         }
 
-        startGameButton.interactable = readyToStart;
+        bool readyValue = false;
+        // detta behöver fixas!
+        if (!string.IsNullOrEmpty(numberOfLapsInputField.text) && readyToStart)
+        {
+            readyValue = true;
+        }
+
+        startGameButton.interactable = readyValue;
     }
 
     [Command]
@@ -141,6 +151,7 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         if (isServer)
         {
             Room.StopHost();
+            Destroy(Room.gameObject);
         }
         else
         {
@@ -163,5 +174,10 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
             }
         }
         return null;
+    }
+
+    public void SetNumberOfLaps(string value)
+    {
+        Room.NumberOfLaps = int.Parse(value);
     }
 }

@@ -11,7 +11,6 @@ public class PlayerUIController : MonoBehaviour
     [SerializeField] Text UITextLastLapTime;
     [SerializeField] Text UITextBestLapTime;
     [SerializeField] Text UITextSpeedKph;
-    [SerializeField] GameObject pauseMenu;
     [SerializeField] GameObject racingPanel;
 
     private CarLapController controller;
@@ -28,7 +27,7 @@ public class PlayerUIController : MonoBehaviour
     private void Start()
     {
         totalLaps = controller.TotalLaps;
-        PauseMenu.IsOn = false;
+        
     }
 
     void Update()
@@ -71,20 +70,16 @@ public class PlayerUIController : MonoBehaviour
         numberOfPlayers = controller.numberOfPlayers;
         UITextCurrentPos.text = $"POS: {position}/{numberOfPlayers}";
 
-        if (InputManager.Controls.Player.Pause.triggered)
+        if (PauseMenu.IsOn)
         {
-            TogglePauseMenu();
+            racingPanel.SetActive(false);
         }
+        else
+        {
+            racingPanel.SetActive(true);
+        }
+        
     }
-
-    void TogglePauseMenu()
-    {
-        pauseMenu.SetActive(!pauseMenu.activeSelf);
-        PauseMenu.IsOn = pauseMenu.activeSelf;
-        racingPanel.SetActive(!racingPanel.activeSelf);
-    }
-
-
 
     public void SetController(CarLapController _controller)
     {

@@ -8,12 +8,13 @@ using System.Linq;
 public class NetworkGamePlayer102 : NetworkBehaviour
 {
     [Header("UI")]
-    [SerializeField] private GameObject lobbyUI = null;
+    [SerializeField] private GameObject finnishMenu = null;
     [SerializeField] private Text[] playerNameTexts = new Text[6];
     [SerializeField] private Text[] playerReadyTexts = new Text[6];
     [SerializeField] private Text[] playerPositionTexts = new Text[6];
     [SerializeField] private Image[] playerBackgrounds = new Image[6];
     [SerializeField] private Button startGameButton = null;
+    [SerializeField] GameObject pauseMenu;
 
     [SyncVar]
     public string DisplayName = "Loading...";
@@ -42,6 +43,11 @@ public class NetworkGamePlayer102 : NetworkBehaviour
         }
     }
 
+    private void Start()
+    {
+        PauseMenu.IsOn = false;
+    }
+
     public override void OnStartClient()
     {
         DontDestroyOnLoad(gameObject);
@@ -57,6 +63,16 @@ public class NetworkGamePlayer102 : NetworkBehaviour
         Room.GamePlayers.Remove(this);
         NetworkManager102.OnSceneChange -= HandleSceneChange;
         PlayerMp.OnFinnished -= HandlePlayerFinnish;
+    }
+
+    private void Update()
+    {
+        if (Position != 999) { return; }
+
+        if (InputManager.Controls.Player.Pause.triggered)
+        {
+            TogglePauseMenu();
+        }
     }
 
     public void HandleReadyStatusChanged(bool oldValue, bool newValue) => UpdateDisplay();
@@ -155,14 +171,15 @@ public class NetworkGamePlayer102 : NetworkBehaviour
 
         if (this.netId == player.OwnderId) 
         {
-            lobbyUI.SetActive(true);
+            finnishMenu.SetActive(true);
+            pauseMenu.SetActive(false);
         }        
     }
 
     [ClientRpc]
     public void RpcDisableUI()
     {
-        lobbyUI.SetActive(false);
+        finnishMenu.SetActive(false);
     }
 
     [Command]
@@ -179,5 +196,48 @@ public class NetworkGamePlayer102 : NetworkBehaviour
         if (!isServer) { return; }
 
         Room.RestartRound();
+    }
+
+    public void OpenMainMenu()
+    {
+        if (isServer)
+        {
+            RpcOpenMainMenu();
+            Room.StopHost();
+            Destroy(Room.gameObject);
+        }
+        else
+        {
+            Room.StopClient();
+            Destroy(Room.gameObject);
+        }
+    }
+
+    public void QuitGame()
+    {
+        if (isServer)
+        {
+            RpcOpenMainMenu();
+            Room.StopHost();
+            Application.Quit();
+        }
+        else
+        {
+            Room.StopClient();
+            Application.Quit();
+        }
+    }
+
+    void TogglePauseMenu()
+    {
+        pauseMenu.SetActive(!pauseMenu.activeSelf);
+        PauseMenu.IsOn = pauseMenu.activeSelf;
+    }
+
+    [ClientRpc]
+    public void RpcOpenMainMenu()
+    {
+        Room.StopClient();
+        Destroy(Room.gameObject);
     }
 }
