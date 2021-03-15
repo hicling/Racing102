@@ -18,6 +18,9 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
     [SyncVar(hook = nameof(HandleReadyStatusChanged))]
     public bool IsReady = false;
 
+    private bool numberOfLapsOk = false;
+    private bool playersReadyToStart = false;
+
     private bool isLeader;
     public bool IsLeader
     {
@@ -48,8 +51,20 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
 
     private void Start()
     {
-
         NameInputPanel = FindInActiveObjectByName("Panel_NameInput");
+    }
+
+    private void Update()
+    {
+        if (numberOfLapsOk && playersReadyToStart)
+        {
+            startGameButton.interactable = true;
+        }
+        else
+        {
+            startGameButton.interactable = false;
+        }
+        
     }
 
     public override void OnStartAuthority()
@@ -113,15 +128,7 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         {
             return;
         }
-
-        bool readyValue = false;
-        // detta behöver fixas!
-        if (!string.IsNullOrEmpty(numberOfLapsInputField.text) && readyToStart)
-        {
-            readyValue = true;
-        }
-
-        startGameButton.interactable = readyValue;
+        playersReadyToStart = readyToStart;
     }
 
     [Command]
@@ -178,6 +185,14 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
 
     public void SetNumberOfLaps(string value)
     {
-        Room.NumberOfLaps = int.Parse(value);
+        if (!string.IsNullOrEmpty(value))
+        {
+            numberOfLapsOk = true;
+            Room.NumberOfLaps = int.Parse(value);
+        }
+        else
+        {
+            numberOfLapsOk = false;
+        }
     }
 }
