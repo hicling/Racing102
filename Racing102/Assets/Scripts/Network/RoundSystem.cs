@@ -78,7 +78,6 @@ public class RoundSystem : NetworkBehaviour
         finnishPosition++;
     }
 
-
     #endregion
 
     #region Client
