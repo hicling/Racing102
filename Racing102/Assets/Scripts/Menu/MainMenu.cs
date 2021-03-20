@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
+using PlayFab.ClientModels;
+using PlayFab;
+using PlayFab.MultiplayerModels;
 
 public class MainMenu : MonoBehaviour
 {
@@ -30,5 +34,12 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void PlayfabJoin()
+    {
+        PlayFab.Helpers.PlayFabAuthService.Instance.Authenticate(PlayFab.Helpers.Authtypes.Silent);
+
+        LandingPagePanel.SetActive(false);
     }
 }

@@ -5,6 +5,8 @@ using Mirror;
 using System;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using PlayFab;
+using kcp2k;
 
 public class NetworkManager102 : NetworkManager
 {
@@ -12,6 +14,9 @@ public class NetworkManager102 : NetworkManager
     private int numberOfLaps;
 
     [SerializeField] private string menuScene = string.Empty;
+
+    [Header("Playfab")]
+    [SerializeField] Configuration _configuration = default;
 
     [Header("Room")]
     [SerializeField] private NetworkRoomPlayer102 roomPlayerPrefab = null;
@@ -23,6 +28,26 @@ public class NetworkManager102 : NetworkManager
     [SerializeField] private GameObject skidMarks = null;
     [SerializeField] private PositionSystem positionSystem = null;
 
+    public Configuration Config
+    {
+        get
+        {
+            return _configuration;
+        }
+    }
+
+    public KcpTransport Transport
+    {
+        get
+        {
+            return transport as KcpTransport;
+        }
+        set
+        {
+            transport = value;
+        }
+    }
+
     public int NumberOfLaps
     {
         set
@@ -30,19 +55,47 @@ public class NetworkManager102 : NetworkManager
             numberOfLaps = value;
         }
     }
-    public static event Action OnClientConnected;
-    public static event Action OnClientDisconnected;
+    public static event Action<NetworkConnection> OnClientConnected;
+    public static event Action<NetworkConnection> OnClientDisconnected;
     public static event Action<NetworkConnection> OnServerReadied;
     public static event Action OnServerStopped;
     public static event Action OnSceneChange;
+    public event Action<string> OnPlayerAdded;
+    public event Action<string> OnPlayerRemoved;
 
+    public List<UnityNetworkConnection> Connections { get; set; }
     public List<NetworkRoomPlayer102> RoomPlayers { get; } = new List<NetworkRoomPlayer102>();
     public List<NetworkGamePlayer102> GamePlayers { get; } = new List<NetworkGamePlayer102>();
+
+    public override void Awake()
+    {
+        base.Awake();
+
+        if (Config.buildType == BuildType.REMOTE_SERVER)
+        {
+            Connections = new List<UnityNetworkConnection>();
+            NetworkServer.RegisterHandler<ReceiveAuthenticateMessage>(OnRecieveAuthenticate);
+        }
+    }
+
+    private void OnRecieveAuthenticate(NetworkConnection _conn, ReceiveAuthenticateMessage msgType)
+    {
+        var conn = Connections.Find(c => c.ConnectionId == _conn.connectionId);
+        if (conn != null)
+        {
+            conn.PlayFabId = msgType.PlayFabId;
+            conn.IsAuthenticated = true;
+            OnPlayerAdded?.Invoke(msgType.PlayFabId);
+        }
+    }
 
     public override void OnStartServer()
     {
         //spawnPrefabs.Clear();
         //spawnPrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs").ToList();
+
+        //new test to see if works
+        RoomPlayers.Clear();
     }    
         
     public override void OnStartClient()
@@ -60,7 +113,7 @@ public class NetworkManager102 : NetworkManager
     {
         base.OnClientConnect(conn);
 
-        OnClientConnected?.Invoke();
+        OnClientConnected?.Invoke(conn);
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -69,21 +122,32 @@ public class NetworkManager102 : NetworkManager
 
         SceneManager.LoadScene(offlineScene);
 
-        OnClientDisconnected?.Invoke();
+        OnClientDisconnected?.Invoke(conn);
     }
 
     public override void OnServerConnect(NetworkConnection conn)
     {
-        if (numPlayers >= maxConnections)
-        {
-            conn.Disconnect();
-            return;
-        }
+        //if (numPlayers >= maxConnections)
+        //{
+        //    conn.Disconnect();
+        //    return;
+        //}
 
-        if (SceneManager.GetActiveScene().name != menuScene)
+        //if (SceneManager.GetActiveScene().name != menuScene)
+        //{
+        //    conn.Disconnect();
+        //    return;
+        //}
+
+        var uconn = Connections.Find(c => c.ConnectionId == conn.connectionId);
+        if (uconn == null)
         {
-            conn.Disconnect();
-            return;
+            Connections.Add(new UnityNetworkConnection()
+            {
+                Connection = conn,
+                ConnectionId = conn.connectionId,
+                LobbyId = PlayFabMultiplayerAgentAPI.SessionConfig.SessionId
+            });
         }
     }
 
@@ -92,6 +156,7 @@ public class NetworkManager102 : NetworkManager
         if (SceneManager.GetActiveScene().name == menuScene)
         {
             bool isLeader = RoomPlayers.Count == 0;
+            Debug.Log("isLeader är: " + isLeader);
 
             NetworkRoomPlayer102 roomPlayerInstance = Instantiate(roomPlayerPrefab);
 
@@ -118,6 +183,16 @@ public class NetworkManager102 : NetworkManager
                 GamePlayers.Remove(gamePlayer);
             }
         }
+
+        var uconn = Connections.Find(c => c.ConnectionId == conn.connectionId);
+        if (uconn != null)
+        {
+            if (!string.IsNullOrEmpty(uconn.PlayFabId))
+            {
+                OnPlayerRemoved?.Invoke(uconn.PlayFabId);
+            }
+            Connections.Remove(uconn);
+        }
         base.OnServerDisconnect(conn);
     }
 
@@ -131,9 +206,13 @@ public class NetworkManager102 : NetworkManager
 
     public void NotifyPlayersOfReadyState()
     {
+        Debug.Log("NotifyPlayersOfReadyState Startad");
+        int antal = 0;
         foreach (var player in RoomPlayers)
         {
             player.HandleReadyToStart(IsReadyToStart());
+            Debug.Log("NotifyPlayersOfReadyState har körts: " + antal);
+            antal++;
         }
     }
 
@@ -147,23 +226,27 @@ public class NetworkManager102 : NetworkManager
 
     private bool IsReadyToStart()
     {
-        if (numPlayers < minPlayers)
+        Debug.Log("IsReadyToStart Startad");
+        if (RoomPlayers.Count < minPlayers)
         {
+            Debug.Log("IsReadyToStart är falskt - fastnat på antal spelare");
             return false;
         }
         foreach (var player in RoomPlayers)
         {
             if (!player.IsReady)
             {
+                Debug.Log("IsReadyToStart är falskt - fastnat på att spelare inte är redo");
                 return false;
             }
         }
+        Debug.Log("IsReadyToStart är sant");
         return true;
     }
 
     private bool IsReadyToStartGame()
     {
-        if (numPlayers < minPlayers)
+        if (RoomPlayers.Count < minPlayers)
         {
             return false;
         }

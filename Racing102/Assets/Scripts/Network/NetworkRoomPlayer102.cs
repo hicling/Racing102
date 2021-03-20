@@ -64,7 +64,6 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
         {
             startGameButton.interactable = false;
         }
-        
     }
 
     public override void OnStartAuthority()
@@ -78,13 +77,27 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
     {
         Room.RoomPlayers.Add(this);
 
+        Debug.Log("Så här många finns det " + Room.RoomPlayers.Count);
+        //for (int i = Room.RoomPlayers.Count - 1; i >= 0; i--)
+        //{
+        //    if (this.netId == Room.RoomPlayers[i].netId)
+        //    {
+        //        Debug.Log("Jag är " + i);
+        //        if (i == 0)
+        //        {
+        //            IsLeader = true;
+        //        }
+        //    }
+        //}
+
+        
         UpdateDisplay();
     }
 
     public override void OnStopClient()
     {
         Room.RoomPlayers.Remove(this);
-
+        
         UpdateDisplay();
     }
 
@@ -129,6 +142,7 @@ public class NetworkRoomPlayer102 : NetworkBehaviour
             return;
         }
         playersReadyToStart = readyToStart;
+        Debug.Log("Ready! Jag har ändrats");
     }
 
     [Command]
