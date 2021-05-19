@@ -253,7 +253,7 @@ GameObject:
   - component: {fileID: 691165335}
   m_Layer: 0
   m_Name: GameHub
-  m_TagString: Untagged
+  m_TagString: GameNetPortal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

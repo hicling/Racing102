@@ -14,7 +14,7 @@ namespace Racing102
         public bool IsNpc;
 
         [Tooltip("For players, this is the displayed \"class name\"")]
-        public string DisplayName;
+        public string DisplayedName;
 
         [Tooltip("For players, this is the class banner (when active)")]
         public Sprite CarBannerLit;
