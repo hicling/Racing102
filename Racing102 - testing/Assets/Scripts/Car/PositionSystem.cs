@@ -1,17 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 using System.Linq;
 using System;
 
-public class PositionSystem : NetworkBehaviour
+public class PositionSystem : MonoBehaviour
 {
     public List<CarLapController> CarLapPlayers { get; } = new List<CarLapController>();
 
     private List<CarLapController> sortedCarLapPlayers = null;
-
-    [SyncVar]
+    //syncvar
     private int totalLaps;
     public int TotalLaps => totalLaps;
 
@@ -37,15 +35,14 @@ public class PositionSystem : NetworkBehaviour
             sortedCarLapPlayers[i].Position = i + 1;
         }
     }
-
-    [Server]
+    //server
     void Finnished(CarLapController player)
     {
         var playerMp = player.GetComponentInParent<PlayerMp>();
         playerMp.SetFinnish(true);
     }
 
-    [Server]
+    //server
     public void SetNumberOfLaps(int numberOfLaps)
     {
         totalLaps = numberOfLaps;

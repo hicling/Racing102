@@ -70,14 +70,14 @@ public class PlayerUIController : MonoBehaviour
         numberOfPlayers = controller.numberOfPlayers;
         UITextCurrentPos.text = $"POS: {position}/{numberOfPlayers}";
 
-        if (PauseMenu.IsOn)
-        {
-            racingPanel.SetActive(false);
-        }
-        else
-        {
-            racingPanel.SetActive(true);
-        }
+        //if (PauseMenu.IsOn)
+        //{
+        //    racingPanel.SetActive(false);
+        //}
+        //else
+        //{
+        //    racingPanel.SetActive(true);
+        //}
         
     }
 
